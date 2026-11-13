@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sovoa motor lab (bêta)</title>
+<style>
+:root{color-scheme:dark;--bg:#101214;--panel:#171a1d;--panel2:#1d2125;--line:#30363b;--text:#e7e9e7;--muted:#929a9f;--accent:#b9d5c5;--blue:#9bbbd7;--orange:#d7ad87}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,system-ui,Arial,sans-serif}
+button,input,select{font:inherit}
+header{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#131619;position:sticky;top:0;z-index:5}
+.logo{font-weight:750;letter-spacing:2px;font-size:13px}.logo span{color:var(--accent)}
+header small{color:var(--muted);font-size:10px;letter-spacing:1px}
+main{max-width:1500px;margin:auto;padding:28px}
+.heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px;gap:20px}
+h1{font-size:25px;letter-spacing:-.8px;margin:0;font-weight:650}
+h2{font-size:13px;font-weight:650;margin:0}
+p{color:var(--muted);line-height:1.55}
+.heading p{font-size:11px;margin:6px 0 0}
+.status{color:var(--accent);font-size:10px}
+.layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:18px}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{background:transparent;color:var(--muted);border:1px solid transparent;padding:12px;text-align:left;border-radius:5px;cursor:pointer}
+nav button.active{background:var(--panel);border-color:var(--line);color:var(--text)}
+nav button span{display:inline-block;width:26px;color:var(--accent);font-family:monospace}
+.content{min-width:0}
+.section{display:none}.section.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);padding:19px;margin-bottom:14px;border-radius:7px}
+.panelhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:17px}
+.panelhead small{color:var(--muted);font-size:10px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.field{min-width:0;margin-bottom:10px}
+.field label{display:flex;justify-content:space-between;gap:8px;color:#c4c9c9;font-size:11px;margin-bottom:7px}
+.field output{font-family:monospace;color:var(--accent)}
+.field input[type=number],.field select{width:100%;background:#101316;border:1px solid var(--line);color:var(--text);padding:9px;border-radius:4px;outline:none}
+.field input[type=range]{width:100%;accent-color:var(--accent)}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.description{font-size:10px;line-height:1.55;color:var(--muted);margin:7px 0 0;min-height:31px}
+.description b{color:#c6d5cc;font-weight:600}
+.note{border-left:2px solid var(--blue);padding:9px 12px;background:#1a2025;color:var(--muted);font-size:10px;line-height:1.6;margin-top:8px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.metric{background:var(--panel);border:1px solid var(--line);padding:13px;border-radius:5px}
+.metric small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px}
+.metric strong{display:block;font:22px ui-monospace,monospace;margin:8px 0 3px}
+.metric em{font-style:normal;color:var(--muted);font-size:10px}
+.metric:first-child strong{color:var(--accent)}
+.metric:nth-child(2) strong{color:var(--orange)}
+canvas{width:100%;height:310px;display:block}
+.table{width:100%;border-collapse:collapse;font-size:11px}
+.table td,.table th{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right}
+.table td:first-child,.table th:first-child{text-align:left;color:var(--muted)}
+.table th{color:var(--muted);font-weight:500}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button.action{background:var(--accent);color:#111;border:0;padding:10px 15px;border-radius:4px;font-weight:650;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:10px 15px;border-radius:4px;cursor:pointer}
+.resultgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.smalltext{font-size:10px;color:var(--muted);line-height:1.6}
+#prelog{white-space:pre-wrap;font:10px ui-monospace,monospace;color:var(--muted);background:#101316;padding:12px;max-height:170px;overflow:auto}
+footer{padding:22px 0;color:var(--muted);font-size:10px;text-align:center}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:repeat(3,1fr)}nav button{font-size:10px;padding:9px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){main{padding:15px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.resultgrid{grid-template-columns:1fr}header{padding:0 15px}.heading{align-items:start;flex-direction:column}canvas{height:260px}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">ENGINE <span>LAB</span></div>
+<small>Sovoa motor lab (Bêta)</small>
+</header>
+<main>
+<div class="heading">
+<div><h1>Powertrain engineering</h1><p>Configuration détaillée, calculs physiques et analyse des performances.</p></div>
+<div class="status" id="status">● MODÈLE NON CALCULÉ</div>
+</div>
+<div class="layout">
+<nav>
+<button class="active" data-tab="engine"><span>01</span>Moteur thermique</button>
+<button data-tab="electric"><span>02</span>Machine électrique</button>
+<button data-tab="battery"><span>03</span>Batterie</button>
+<button data-tab="transmission"><span>04</span>Transmission</button>
+<button data-tab="environment"><span>05</span>Conditions</button>
+<button data-tab="results"><span>06</span>Résultats</button>
+</nav>
+<div class="content">
+<section class="section active" id="engine">
+<div class="panel">
+<div class="panelhead"><h2>Architecture thermique</h2><small>THERMAL ENGINE</small></div>
+<div class="grid">
+<div class="field"><label>Type de moteur</label><select id="engineType"><option value="na">Essence atmosphérique</option><option value="turbo">Essence turbocompressé</option><option value="diesel">Diesel turbocompressé</option><option value="electric">100 % électrique</option></select><p class="description">Définit le principe de propulsion. Le moteur atmosphérique aspire naturellement l'air, le turbo augmente la masse d'air admise et le diesel utilise l'auto-inflammation du carburant.</p></div>
+<div class="field"><label>Architecture</label><select id="layout"><option>En ligne</option><option>V</option><option>Flat / Boxer</option><option>W</option><option>Radial</option></select><p class="description">Disposition physique des cylindres. Elle influence l'encombrement, l'équilibrage, les vibrations et les dimensions du moteur, mais ne crée pas directement de puissance.</p></div>
+<div class="field"><label>Nombre de cylindres</label><input id="cyl" type="number" min="1" max="32" value="4"><p class="description">Nombre de chambres de combustion. Il intervient dans la cylindrée géométrique, la fréquence des combustions et l'équilibrage mécanique.</p></div>
+<div class="field"><label>Cylindrée totale <output id="dispOut">2.00 L</output></label><input id="disp" type="range" min=".2" max="15" step=".05" value="2"><p class="description">Volume balayé total par les pistons. Une cylindrée supérieure permet généralement de déplacer davantage d'air et de produire plus de couple, à pression effective égale.</p></div>
+<div class="field"><label>Alésage <output id="boreOut">86 mm</output></label><input id="bore" type="range" min="40" max="150" value="86"><p class="description">Diamètre intérieur du cylindre. Il détermine avec la course le volume balayé et influence la surface de soupapes disponible et la géométrie de la chambre.</p></div>
+<div class="field"><label>Course <output id="strokeOut">86 mm</output></label><input id="stroke" type="range" min="30" max="160" value="86"><p class="description">Distance parcourue par le piston entre PMH et PMB. Elle détermine la cylindrée et la vitesse moyenne du piston à un régime donné.</p></div>
+<div class="field"><label>Compression <output id="compOut">10.0:1</output></label><input id="comp" type="range" min="6" max="25" step=".1" value="10"><p class="description">Rapport entre volume maximal et volume minimal du cylindre. Il influence le rendement thermodynamique et la résistance au cliquetis ou à l'auto-inflammation.</p></div>
+<div class="field"><label>Régime maximal <output id="maxRpmOut">6500 rpm</output></label><input id="maxRpm" type="range" min="1000" max="20000" step="100" value="6500"><p class="description">Régime supérieur étudié par le modèle. Ce réglage n'est pas une limite mécanique calculée : les contraintes des bielles, pistons, soupapes et paliers doivent être vérifiées séparément.</p></div>
+<div class="field"><label>Régime de puissance maximale <output id="powerRpmOut">6000 rpm</output></label><input id="powerRpm" type="range" min="500" max="18000" step="100" value="6000"><p class="description">Régime de référence autour duquel le modèle représente la baisse de remplissage à haut régime. Il sert à façonner la courbe de couple estimée.</p></div>
+<div class="field"><label>Pression turbo relative <output id="boostOut">0.80 bar</output></label><input id="boost" type="range" min="0" max="4" step=".05" value=".8"><p class="description">Surpression au-dessus de la pression atmosphérique. La pression absolue d'admission dépend également de l'altitude, des pertes dans l'admission et de l'efficacité du compresseur.</p></div>
+<div class="field"><label>Rendement volumétrique <output id="veOut">90 %</output></label><input id="ve" type="range" min="30" max="150" value="90"><p class="description">Rapport entre masse d'air réellement admise et masse théorique correspondant à la cylindrée. Il dépend du régime, des soupapes, de l'admission et de la distribution.</p></div>
+<div class="field"><label>IMEP de référence <output id="bmepOut">10.8 bar</output></label><input id="bmep" type="range" min="2" max="40" step=".1" value="10.8"><p class="description">Pression moyenne effective indiquée utilisée comme référence. Le modèle en déduit la pression au frein en retirant la FMEP estimée.</p></div>
+<div class="field"><label>Carburant</label><select id="fuel"><option value="sp98">SP98</option><option value="sp95">SP95</option><option value="e10">SP95-E10</option><option value="diesel">Diesel B7</option></select><p class="description">Carburant utilisé. L'indice d'octane mesure la résistance au cliquetis pour l'essence ; le cétane concerne l'aptitude à l'auto-inflammation du gazole.</p></div>
+<div class="field"><label>Rendement de combustion <output id="combOut">96 %</output></label><input id="comb" type="range" min="50" max="100" value="96"><p class="description">Facteur simplifié représentant la qualité de libération de l'énergie chimique. Il dépend du mélange, de la turbulence, de l'allumage et de la combustion réelle.</p></div>
+<div class="field"><label>FMEP <output id="fmepOut">0.90 bar</output></label><input id="fmep" type="range" min=".1" max="8" step=".05" value=".9"><p class="description">Pression moyenne effective de frottement. Elle représente les pertes mécaniques internes rapportées à la cylindrée et réduit le couple utile.</p></div>
+<div class="field"><label>Lambda pleine charge <output id="lambdaOut">0.88</output></label><input id="lambda" type="range" min=".65" max="1.5" step=".01" value=".88"><p class="description">Rapport entre le rapport air/carburant réel et le rapport stœchiométrique. Lambda inférieur à 1 indique un mélange riche ; supérieur à 1, un mélange pauvre.</p></div>
+</div>
+</div>
+</section>
+<section class="section" id="electric">
+<div class="panel">
+<div class="panelhead"><h2>Machine électrique</h2><small>ELECTRIC MACHINE</small></div>
+<div class="grid">
+<div class="field"><label>Architecture hybride</label><select id="hybrid"><option value="none">Thermique seul</option><option value="p0">P0 — alterno-démarreur</option><option value="p1">P1 — vilebrequin</option><option value="p2">P2 — entre moteur et boîte</option><option value="p3">P3 — sortie de boîte</option><option value="p4">P4 — essieu indépendant</option><option value="series">Hybride série</option><option value="plugin">Hybride rechargeable</option><option value="bev">Électrique pur</option></select><p class="description">Définit la position et le rôle de la machine électrique. P0 à P4 décrivent son emplacement ; série signifie que le moteur thermique entraîne un générateur plutôt que directement les roues.</p></div>
+<div class="field"><label>Type de machine</label><select id="motorType"><option value="ipm">Synchrone aimants permanents intérieurs</option><option value="spm">Synchrone aimants en surface</option><option value="induction">Asynchrone</option><option value="srm">Reluctance commutée</option></select><p class="description">Technologie électromagnétique. Elle détermine les caractéristiques de couple, de rendement, de refroidissement et de contrôle de la machine.</p></div>
+<div class="field"><label>Nombre de machines</label><input id="motorCount" type="number" min="1" max="8" value="1"><p class="description">Nombre de moteurs électriques. Le modèle suppose des machines identiques partageant la charge ; leur emplacement peut modifier les limites de transmission.</p></div>
+<div class="field"><label>Puissance maximale <output id="motorPowerOut">80 kW</output></label><input id="motorPower" type="range" min="1" max="1000" value="80"><p class="description">Puissance mécanique maximale nominale des machines. Elle est distincte de la puissance électrique absorbée à la batterie, qui inclut les pertes.</p></div>
+<div class="field"><label>Couple maximal <output id="motorTorqueOut">250 Nm</output></label><input id="motorTorque" type="range" min="5" max="3000" step="5" value="250"><p class="description">Couple maximal à bas régime. Il est limité par le courant, la saturation magnétique, la température et les capacités de l'onduleur.</p></div>
+<div class="field"><label>Régime maximal <output id="motorMaxOut">16000 rpm</output></label><input id="motorMax" type="range" min="500" max="40000" step="500" value="16000"><p class="description">Vitesse de rotation maximale de la machine. Au-delà, les contraintes mécaniques du rotor et les limites de commande peuvent devenir critiques.</p></div>
+<div class="field"><label>Régime de base <output id="motorBaseOut">5000 rpm</output></label><input id="motorBase" type="range" min="100" max="30000" step="100" value="5000"><p class="description">Régime auquel la machine passe approximativement de la zone à couple constant à la zone à puissance constante, sous réserve de ses limites électriques.</p></div>
+<div class="field"><label>Rendement maximal <output id="motorEffOut">94 %</output></label><input id="motorEff" type="range" min="50" max="99" value="94"><p class="description">Part de la puissance électrique convertie en puissance mécanique au meilleur point de fonctionnement. Le rendement réel varie avec le couple et le régime.</p></div>
+<div class="field"><label>Disponibilité de puissance <output id="motorDerateOut">100 %</output></label><input id="motorDerate" type="range" min="10" max="100" value="100"><p class="description">Facteur de déclassement appliqué à la machine. Il représente une réduction due à la température, à la tension ou à une stratégie de protection.</p></div>
+<div class="field"><label>Puissance de récupération <output id="regenOut">35 kW</output></label><input id="regen" type="range" min="0" max="500" value="35"><p class="description">Puissance mécanique maximale pouvant être convertie en électricité au freinage. La récupération dépend aussi de l'adhérence, du SOC et de la capacité de charge de la batterie.</p></div>
+<div class="field"><label>Température machine <output id="motorTempOut">100 °C</output></label><input id="motorTemp" type="range" min="20" max="220" value="100"><p class="description">Température estimée de la machine. Une température excessive réduit la puissance disponible et peut endommager les isolants ou les aimants.</p></div>
+</div>
+</div>
+<div class="panel">
+<div class="panelhead"><h2>Électronique de puissance</h2><small>INVERTER</small></div>
+<div class="grid">
+<div class="field"><label>Puissance maximale <output id="invPowerOut">100 kW</output></label><input id="invPower" type="range" min="1" max="1000" value="100"><p class="description">Puissance électrique maximale que l'onduleur peut traiter. Elle limite la puissance de la machine même si celle-ci est capable d'en fournir davantage.</p></div>
+<div class="field"><label>Rendement onduleur <output id="invEffOut">97 %</output></label><input id="invEff" type="range" min="50" max="99.9" step=".1" value="97"><p class="description">Part de l'énergie électrique conservée lors de la conversion entre courant continu batterie et courant alternatif machine.</p></div>
+<div class="field"><label>Courant maximal DC <output id="invCurrentOut">400 A</output></label><input id="invCurrent" type="range" min="10" max="3000" step="10" value="400"><p class="description">Courant continu maximal accepté par l'onduleur. Il limite la puissance électrique disponible selon la tension du bus DC.</p></div>
+</div>
+</div>
+</section>
