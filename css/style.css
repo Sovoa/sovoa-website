@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
+div.after-header {
+	font-family: arial;
+	background-color: #FFF;
+}
+
+body {
+	background-color: #F5F5F0;
+}
+
+h1.div-after-header {
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-top: 10%;
+	font-size: 700%;
+	color: #34A7E9;
+	font-family: 'Monsieur La Doulaise';
+}
+
+p.div-after-header {
+	padding-left: 25.8%;
+	font-size: 105%;
+	padding-right: 25%;
+	padding-bottom: 17%;
+	color: #2986bb;
+}
+
+div.first-content {
+	padding-left: 25%;
+	padding-right: 25%; 
+	padding-top: 0p;
+	color: #000;
+	padding-bottom: 0p;
+}
+
+h3.title-first-content {
+	font-family: "PT mono";
+	font-size: 275%;
+	padding-top: 2%;
+}
+
+p.content-first-content {
+	font-family: arial;
+	font-size: 170%;
+}
+
+div.second-content {
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-top: 0p;
+	color: #222;				
+}
