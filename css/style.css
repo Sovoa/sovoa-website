@@ -50,3 +50,14 @@ div.second-content {
 	padding-top: 0p;
 	color: #222;				
 }
+
+h3.title-second-content {
+	font-family: "PT mono";
+	font-size: 275%;
+	padding-top: 2%;
+}
+
+p.content-second-content {
+	font-family: arial;
+	font-size: 170%;
+}
