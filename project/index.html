@@ -1,133 +1,253 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sovoa motor lab (bêta)</title>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sovoa motor simulations V2 [bêta]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&family=PT+Mono&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#101214;--panel:#171a1d;--panel2:#1d2125;--line:#30363b;--text:#e7e9e7;--muted:#929a9f;--accent:#b9d5c5;--blue:#9bbbd7;--orange:#d7ad87}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,system-ui,Arial,sans-serif}
-button,input,select{font:inherit}
-header{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#131619;position:sticky;top:0;z-index:5}
-.logo{font-weight:750;letter-spacing:2px;font-size:13px}.logo span{color:var(--accent)}
-header small{color:var(--muted);font-size:10px;letter-spacing:1px}
-main{max-width:1500px;margin:auto;padding:28px}
-.heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px;gap:20px}
-h1{font-size:25px;letter-spacing:-.8px;margin:0;font-weight:650}
-h2{font-size:13px;font-weight:650;margin:0}
-p{color:var(--muted);line-height:1.55}
-.heading p{font-size:11px;margin:6px 0 0}
-.status{color:var(--accent);font-size:10px}
-.layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:18px}
-nav{display:flex;flex-direction:column;gap:4px}
-nav button{background:transparent;color:var(--muted);border:1px solid transparent;padding:12px;text-align:left;border-radius:5px;cursor:pointer}
-nav button.active{background:var(--panel);border-color:var(--line);color:var(--text)}
-nav button span{display:inline-block;width:26px;color:var(--accent);font-family:monospace}
-.content{min-width:0}
-.section{display:none}.section.active{display:block}
-.panel{background:var(--panel);border:1px solid var(--line);padding:19px;margin-bottom:14px;border-radius:7px}
-.panelhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:17px}
-.panelhead small{color:var(--muted);font-size:10px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.field{min-width:0;margin-bottom:10px}
-.field label{display:flex;justify-content:space-between;gap:8px;color:#c4c9c9;font-size:11px;margin-bottom:7px}
-.field output{font-family:monospace;color:var(--accent)}
-.field input[type=number],.field select{width:100%;background:#101316;border:1px solid var(--line);color:var(--text);padding:9px;border-radius:4px;outline:none}
-.field input[type=range]{width:100%;accent-color:var(--accent)}
-.field input:focus,.field select:focus{border-color:var(--accent)}
-.description{font-size:10px;line-height:1.55;color:var(--muted);margin:7px 0 0;min-height:31px}
-.description b{color:#c6d5cc;font-weight:600}
-.note{border-left:2px solid var(--blue);padding:9px 12px;background:#1a2025;color:var(--muted);font-size:10px;line-height:1.6;margin-top:8px}
-.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.metric{background:var(--panel);border:1px solid var(--line);padding:13px;border-radius:5px}
-.metric small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px}
-.metric strong{display:block;font:22px ui-monospace,monospace;margin:8px 0 3px}
-.metric em{font-style:normal;color:var(--muted);font-size:10px}
-.metric:first-child strong{color:var(--accent)}
-.metric:nth-child(2) strong{color:var(--orange)}
-canvas{width:100%;height:310px;display:block}
-.table{width:100%;border-collapse:collapse;font-size:11px}
-.table td,.table th{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right}
-.table td:first-child,.table th:first-child{text-align:left;color:var(--muted)}
-.table th{color:var(--muted);font-weight:500}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-button.action{background:var(--accent);color:#111;border:0;padding:10px 15px;border-radius:4px;font-weight:650;cursor:pointer}
-button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:10px 15px;border-radius:4px;cursor:pointer}
-.resultgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
-.smalltext{font-size:10px;color:var(--muted);line-height:1.6}
-#prelog{white-space:pre-wrap;font:10px ui-monospace,monospace;color:var(--muted);background:#101316;padding:12px;max-height:170px;overflow:auto}
-footer{padding:22px 0;color:var(--muted);font-size:10px;text-align:center}
-@media(max-width:900px){.layout{grid-template-columns:1fr}nav{display:grid;grid-template-columns:repeat(3,1fr)}nav button{font-size:10px;padding:9px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){main{padding:15px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.resultgrid{grid-template-columns:1fr}header{padding:0 15px}.heading{align-items:start;flex-direction:column}canvas{height:260px}}
-</style>
-</head>
-<body>
-<header>
-<div class="logo">ENGINE <span>LAB</span></div>
-<small>Sovoa motor lab (Bêta)</small>
-</header>
-<main>
-<div class="heading">
-<div><h1>Powertrain engineering</h1><p>Configuration détaillée, calculs physiques et analyse des performances.</p></div>
-<div class="status" id="status">● MODÈLE NON CALCULÉ</div>
-</div>
-<div class="layout">
-<nav>
-<button class="active" data-tab="engine"><span>01</span>Moteur thermique</button>
-<button data-tab="electric"><span>02</span>Machine électrique</button>
-<button data-tab="battery"><span>03</span>Batterie</button>
-<button data-tab="transmission"><span>04</span>Transmission</button>
-<button data-tab="environment"><span>05</span>Conditions</button>
-<button data-tab="results"><span>06</span>Résultats</button>
-</nav>
-<div class="content">
-<section class="section active" id="engine">
-<div class="panel">
-<div class="panelhead"><h2>Architecture thermique</h2><small>THERMAL ENGINE</small></div>
-<div class="grid">
-<div class="field"><label>Type de moteur</label><select id="engineType"><option value="na">Essence atmosphérique</option><option value="turbo">Essence turbocompressé</option><option value="diesel">Diesel turbocompressé</option><option value="electric">100 % électrique</option></select><p class="description">Définit le principe de propulsion. Le moteur atmosphérique aspire naturellement l'air, le turbo augmente la masse d'air admise et le diesel utilise l'auto-inflammation du carburant.</p></div>
-<div class="field"><label>Architecture</label><select id="layout"><option>En ligne</option><option>V</option><option>Flat / Boxer</option><option>W</option><option>Radial</option></select><p class="description">Disposition physique des cylindres. Elle influence l'encombrement, l'équilibrage, les vibrations et les dimensions du moteur, mais ne crée pas directement de puissance.</p></div>
-<div class="field"><label>Nombre de cylindres</label><input id="cyl" type="number" min="1" max="32" value="4"><p class="description">Nombre de chambres de combustion. Il intervient dans la cylindrée géométrique, la fréquence des combustions et l'équilibrage mécanique.</p></div>
-<div class="field"><label>Cylindrée totale <output id="dispOut">2.00 L</output></label><input id="disp" type="range" min=".2" max="15" step=".05" value="2"><p class="description">Volume balayé total par les pistons. Une cylindrée supérieure permet généralement de déplacer davantage d'air et de produire plus de couple, à pression effective égale.</p></div>
-<div class="field"><label>Alésage <output id="boreOut">86 mm</output></label><input id="bore" type="range" min="40" max="150" value="86"><p class="description">Diamètre intérieur du cylindre. Il détermine avec la course le volume balayé et influence la surface de soupapes disponible et la géométrie de la chambre.</p></div>
-<div class="field"><label>Course <output id="strokeOut">86 mm</output></label><input id="stroke" type="range" min="30" max="160" value="86"><p class="description">Distance parcourue par le piston entre PMH et PMB. Elle détermine la cylindrée et la vitesse moyenne du piston à un régime donné.</p></div>
-<div class="field"><label>Compression <output id="compOut">10.0:1</output></label><input id="comp" type="range" min="6" max="25" step=".1" value="10"><p class="description">Rapport entre volume maximal et volume minimal du cylindre. Il influence le rendement thermodynamique et la résistance au cliquetis ou à l'auto-inflammation.</p></div>
-<div class="field"><label>Régime maximal <output id="maxRpmOut">6500 rpm</output></label><input id="maxRpm" type="range" min="1000" max="20000" step="100" value="6500"><p class="description">Régime supérieur étudié par le modèle. Ce réglage n'est pas une limite mécanique calculée : les contraintes des bielles, pistons, soupapes et paliers doivent être vérifiées séparément.</p></div>
-<div class="field"><label>Régime de puissance maximale <output id="powerRpmOut">6000 rpm</output></label><input id="powerRpm" type="range" min="500" max="18000" step="100" value="6000"><p class="description">Régime de référence autour duquel le modèle représente la baisse de remplissage à haut régime. Il sert à façonner la courbe de couple estimée.</p></div>
-<div class="field"><label>Pression turbo relative <output id="boostOut">0.80 bar</output></label><input id="boost" type="range" min="0" max="4" step=".05" value=".8"><p class="description">Surpression au-dessus de la pression atmosphérique. La pression absolue d'admission dépend également de l'altitude, des pertes dans l'admission et de l'efficacité du compresseur.</p></div>
-<div class="field"><label>Rendement volumétrique <output id="veOut">90 %</output></label><input id="ve" type="range" min="30" max="150" value="90"><p class="description">Rapport entre masse d'air réellement admise et masse théorique correspondant à la cylindrée. Il dépend du régime, des soupapes, de l'admission et de la distribution.</p></div>
-<div class="field"><label>IMEP de référence <output id="bmepOut">10.8 bar</output></label><input id="bmep" type="range" min="2" max="40" step=".1" value="10.8"><p class="description">Pression moyenne effective indiquée utilisée comme référence. Le modèle en déduit la pression au frein en retirant la FMEP estimée.</p></div>
-<div class="field"><label>Carburant</label><select id="fuel"><option value="sp98">SP98</option><option value="sp95">SP95</option><option value="e10">SP95-E10</option><option value="diesel">Diesel B7</option></select><p class="description">Carburant utilisé. L'indice d'octane mesure la résistance au cliquetis pour l'essence ; le cétane concerne l'aptitude à l'auto-inflammation du gazole.</p></div>
-<div class="field"><label>Rendement de combustion <output id="combOut">96 %</output></label><input id="comb" type="range" min="50" max="100" value="96"><p class="description">Facteur simplifié représentant la qualité de libération de l'énergie chimique. Il dépend du mélange, de la turbulence, de l'allumage et de la combustion réelle.</p></div>
-<div class="field"><label>FMEP <output id="fmepOut">0.90 bar</output></label><input id="fmep" type="range" min=".1" max="8" step=".05" value=".9"><p class="description">Pression moyenne effective de frottement. Elle représente les pertes mécaniques internes rapportées à la cylindrée et réduit le couple utile.</p></div>
-<div class="field"><label>Lambda pleine charge <output id="lambdaOut">0.88</output></label><input id="lambda" type="range" min=".65" max="1.5" step=".01" value=".88"><p class="description">Rapport entre le rapport air/carburant réel et le rapport stœchiométrique. Lambda inférieur à 1 indique un mélange riche ; supérieur à 1, un mélange pauvre.</p></div>
-</div>
-</div>
-</section>
-<section class="section" id="electric">
-<div class="panel">
-<div class="panelhead"><h2>Machine électrique</h2><small>ELECTRIC MACHINE</small></div>
-<div class="grid">
-<div class="field"><label>Architecture hybride</label><select id="hybrid"><option value="none">Thermique seul</option><option value="p0">P0 — alterno-démarreur</option><option value="p1">P1 — vilebrequin</option><option value="p2">P2 — entre moteur et boîte</option><option value="p3">P3 — sortie de boîte</option><option value="p4">P4 — essieu indépendant</option><option value="series">Hybride série</option><option value="plugin">Hybride rechargeable</option><option value="bev">Électrique pur</option></select><p class="description">Définit la position et le rôle de la machine électrique. P0 à P4 décrivent son emplacement ; série signifie que le moteur thermique entraîne un générateur plutôt que directement les roues.</p></div>
-<div class="field"><label>Type de machine</label><select id="motorType"><option value="ipm">Synchrone aimants permanents intérieurs</option><option value="spm">Synchrone aimants en surface</option><option value="induction">Asynchrone</option><option value="srm">Reluctance commutée</option></select><p class="description">Technologie électromagnétique. Elle détermine les caractéristiques de couple, de rendement, de refroidissement et de contrôle de la machine.</p></div>
-<div class="field"><label>Nombre de machines</label><input id="motorCount" type="number" min="1" max="8" value="1"><p class="description">Nombre de moteurs électriques. Le modèle suppose des machines identiques partageant la charge ; leur emplacement peut modifier les limites de transmission.</p></div>
-<div class="field"><label>Puissance maximale <output id="motorPowerOut">80 kW</output></label><input id="motorPower" type="range" min="1" max="1000" value="80"><p class="description">Puissance mécanique maximale nominale des machines. Elle est distincte de la puissance électrique absorbée à la batterie, qui inclut les pertes.</p></div>
-<div class="field"><label>Couple maximal <output id="motorTorqueOut">250 Nm</output></label><input id="motorTorque" type="range" min="5" max="3000" step="5" value="250"><p class="description">Couple maximal à bas régime. Il est limité par le courant, la saturation magnétique, la température et les capacités de l'onduleur.</p></div>
-<div class="field"><label>Régime maximal <output id="motorMaxOut">16000 rpm</output></label><input id="motorMax" type="range" min="500" max="40000" step="500" value="16000"><p class="description">Vitesse de rotation maximale de la machine. Au-delà, les contraintes mécaniques du rotor et les limites de commande peuvent devenir critiques.</p></div>
-<div class="field"><label>Régime de base <output id="motorBaseOut">5000 rpm</output></label><input id="motorBase" type="range" min="100" max="30000" step="100" value="5000"><p class="description">Régime auquel la machine passe approximativement de la zone à couple constant à la zone à puissance constante, sous réserve de ses limites électriques.</p></div>
-<div class="field"><label>Rendement maximal <output id="motorEffOut">94 %</output></label><input id="motorEff" type="range" min="50" max="99" value="94"><p class="description">Part de la puissance électrique convertie en puissance mécanique au meilleur point de fonctionnement. Le rendement réel varie avec le couple et le régime.</p></div>
-<div class="field"><label>Disponibilité de puissance <output id="motorDerateOut">100 %</output></label><input id="motorDerate" type="range" min="10" max="100" value="100"><p class="description">Facteur de déclassement appliqué à la machine. Il représente une réduction due à la température, à la tension ou à une stratégie de protection.</p></div>
-<div class="field"><label>Puissance de récupération <output id="regenOut">35 kW</output></label><input id="regen" type="range" min="0" max="500" value="35"><p class="description">Puissance mécanique maximale pouvant être convertie en électricité au freinage. La récupération dépend aussi de l'adhérence, du SOC et de la capacité de charge de la batterie.</p></div>
-<div class="field"><label>Température machine <output id="motorTempOut">100 °C</output></label><input id="motorTemp" type="range" min="20" max="220" value="100"><p class="description">Température estimée de la machine. Une température excessive réduit la puissance disponible et peut endommager les isolants ou les aimants.</p></div>
-</div>
-</div>
-<div class="panel">
-<div class="panelhead"><h2>Électronique de puissance</h2><small>INVERTER</small></div>
-<div class="grid">
-<div class="field"><label>Puissance maximale <output id="invPowerOut">100 kW</output></label><input id="invPower" type="range" min="1" max="1000" value="100"><p class="description">Puissance électrique maximale que l'onduleur peut traiter. Elle limite la puissance de la machine même si celle-ci est capable d'en fournir davantage.</p></div>
-<div class="field"><label>Rendement onduleur <output id="invEffOut">97 %</output></label><input id="invEff" type="range" min="50" max="99.9" step=".1" value="97"><p class="description">Part de l'énergie électrique conservée lors de la conversion entre courant continu batterie et courant alternatif machine.</p></div>
-<div class="field"><label>Courant maximal DC <output id="invCurrentOut">400 A</output></label><input id="invCurrent" type="range" min="10" max="3000" step="10" value="400"><p class="description">Courant continu maximal accepté par l'onduleur. Il limite la puissance électrique disponible selon la tension du bus DC.</p></div>
-</div>
-</div>
-</section>
+:root{--bg:#F5F5F0;--card:#fff;--tx:#222;--mu:#5d6b75;--bd:#dfe3e6;--ac:#34A7E9;--ac2:#e8590c;--dk:#2986bb;--ok:#2b8a3e;--wa:#e8590c;--ko:#c92a2a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161c;--card:#19212a;--tx:#e8edf2;--mu:#8fa0b0;--bd:#2b3744;--ac:#4db8ff;--ac2:#ff9248;--dk:#6cc3ff;--ok:#69db7c;--wa:#ffa94d;--ko:#ff8787;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10161c;--card:#19212a;--tx:#e8edf2;--mu:#8fa0b0;--bd:#2b3744;--ac:#4db8ff;--ac2:#ff9248;--dk:#6cc3ff;--ok:#69db7c;--wa:#ffa94d;--ko:#ff8787;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Arial,Helvetica,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--bd);padding:18px 16px 14px;text-align:center}
+h1{margin:0;font:400 clamp(40px,8vw,68px)/1.1 'Monsieur La Doulaise',cursive,serif;color:var(--ac)}
+.bt{display:inline-block;font:12px 'PT Mono',monospace;border:1px solid var(--ac);color:var(--dk);border-radius:20px;padding:1px 9px;vertical-align:middle;margin-left:6px}
+header p{margin:4px 0 0;color:var(--dk);font-size:14px}
+main{max-width:1120px;margin:0 auto;padding:16px}
+.g{display:grid;grid-template-columns:350px 1fr;gap:16px}@media(max-width:800px){.g{grid-template-columns:1fr}}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
+h3{font:400 17px 'PT Mono',monospace;margin:0 0 8px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.tabs button,.bn{border:1px solid var(--bd);background:var(--bg);color:var(--mu);border-radius:8px;padding:6px 10px;font:13px 'PT Mono',monospace;cursor:pointer}
+.tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.p,.rp{display:none}.p.on,.rp.on{display:block}
+label{display:flex;justify-content:space-between;font-size:13px;color:var(--mu);margin:10px 0 3px}label b{color:var(--tx);font-weight:600}
+select,input[type=range]{width:100%}select{padding:7px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:14px}
+input[type=range]{accent-color:var(--ac)}
+.k{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}@media(max-width:600px){.k{grid-template-columns:repeat(2,1fr)}}
+.k div{background:var(--bg);border-radius:10px;padding:8px 10px}.k small{color:var(--mu);font-size:11px;display:block}.k strong{font:17px 'PT Mono',monospace}
+canvas{width:100%;display:block}#cv{height:290px}#cv2{height:200px;margin-top:10px}#ea{height:380px;background:var(--bg);border-radius:10px}
+svg{width:100%;height:150px;display:block}
+.n{font-size:12.5px;color:var(--mu);margin-top:8px}#wr{color:var(--wa);font-size:13px;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:5px 4px;border-bottom:1px solid var(--bd)}td+td{text-align:right;font-family:'PT Mono',monospace}
+.bar{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%}
+.lg{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--mu)}
+</style></head><body>
+<header><h1>Sovoa motor simulations<span class="bt">V2 [bêta]</span></h1><p>Construis ton moteur, regarde-le tourner et mesure ses performances.</p></header>
+<main><div class="g">
+<div class="c"><h3>Configuration</h3><div class="tabs" id="tb"></div><div id="pn"></div></div>
+<div>
+<div class="c" style="margin-bottom:16px"><div class="k">
+<div><small>Puissance max</small><strong id="k1"></strong></div><div><small>Couple max</small><strong id="k2"></strong></div>
+<div><small>Cylindrée</small><strong id="k3"></strong></div><div><small>Régime max</small><strong id="k4"></strong></div>
+<div><small>Poids</small><strong id="k5"></strong></div><div><small>Conso. (90 km/h)</small><strong id="k6"></strong></div>
+<div><small>Fiabilité</small><strong id="k7"></strong></div><div><small>Coût de fabrication</small><strong id="k8"></strong></div></div>
+<div id="wr"></div>
+<div class="tabs" id="rtb"><button data-r="0">Courbes</button><button data-r="1">Moteur en marche</button><button data-r="2">Bilan</button></div>
+<div class="rp" id="r0"><canvas id="cv"></canvas><div class="n"><span style="color:var(--ac)">●</span> Puissance (ch) &nbsp; <span style="color:var(--ac2)">●</span> Couple (Nm)</div>
+<canvas id="cv2"></canvas><div class="n"><span style="color:var(--ac)">●</span> Remplissage (%) &nbsp; <span style="color:var(--ac2)">●</span> Consommation spécifique (g/kWh)</div></div>
+<div class="rp" id="r1"><canvas id="ea"></canvas>
+<label>Régime affiché <b id="vr"></b></label><input type="range" id="ra" min="800" max="6000" step="100" value="3000">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="bn" id="bp">Pause</button><button class="bn" id="bs2">Son : off</button></div>
+<div class="n" id="rd"></div>
+<div class="lg" style="margin-top:6px"><span style="color:#ff6b3d">■ Combustion</span><span style="color:#868e96">■ Échappement</span><span style="color:#4dabf7">■ Admission</span><span style="color:#e0a800">■ Compression</span></div>
+<div class="n">Animation ralentie pour être lisible. Vue de bout : une rangée de cylindres est montrée par bras.</div></div>
+<div class="rp" id="r2"><div id="bil"></div><h3 style="margin-top:14px">Répartition de l’énergie du carburant (à la puissance max)</h3><div id="en"></div><svg id="sv" viewBox="0 0 400 150"></svg><div class="n" id="nt"></div></div>
+</div></div></div></main>
+<script>
+var $=function(i){return document.getElementById(i)},P={},lastAr='',PT=[],RT=0,RED=6000,NCYL=6,GEO={};
+var AN={th:0,t:0,rpm:3000,on:true,ctx:null};
+var CY={L:[1,2,3,4,5,6],V:[2,4,6,8,10,12],W:[8,12,16],F:[2,4,6,8]};
+var BAL={L1:20,L2:40,L3:55,L4:60,L5:75,L6:100,V2:50,V4:50,V6:80,V8:85,V10:85,V12:100,W8:70,W12:85,W16:90,F2:70,F4:85,F6:100,F8:100};
+var NA=function(P){return P.fu!='a'};
+var CF=[
+['Bloc',[
+{k:'ar',l:'Architecture',o:[['L','En ligne'],['V','En V'],['W','En W'],['F','À plat (boxer)']],d:'V'},
+{k:'nc',l:'Cylindres',o:[],d:'6'},
+{k:'an',l:'Angle entre rangées',min:20,max:120,step:5,d:90,u:'°',s:function(P){return P.ar=='V'||P.ar=='W'}},
+{k:'bo',l:'Alésage',min:50,max:110,d:86,u:' mm'},
+{k:'st',l:'Course',min:40,max:110,d:86,u:' mm'},
+{k:'bl',l:'Matériau du bloc',o:[['f','Fonte'],['a','Aluminium'],['m','Magnésium']],d:'a'},
+{k:'pi',l:'Pistons',o:[['c','Coulés'],['f','Alu forgé'],['l','Forgés allégés']],d:'f'},
+{k:'bi',l:'Bielles',o:[['c','Acier coulé'],['a','Acier forgé'],['t','Titane']],d:'a'},
+{k:'vi',l:'Vilebrequin',o:[['f','Fonte'],['a','Acier forgé'],['b','Billette']],d:'a'},
+{k:'vo',l:'Volant moteur',o:[['l','Allégé'],['s','Standard'],['h','Lourd']],d:'s'},
+{k:'pm',l:'Paliers de vilebrequin',min:2,max:13,d:5}]],
+['Culasse',[
+{k:'vl',l:'Soupapes par cylindre',min:2,max:5,d:4},
+{k:'di',l:'Distribution',o:[['o','OHV (culbuteurs)'],['s','SOHC (1 ACT)'],['d','DOHC (2 ACT)']],d:'d'},
+{k:'vv',l:'Calage variable',o:[['n','Aucun'],['a','Admission'],['d','Admission + échappement']],d:'a'},
+{k:'ca',l:'Profil des cames (doux → sport)',min:0,max:100,d:40,u:' %'},
+{k:'lv',l:'Levée de soupape',min:6,max:16,step:0.5,d:10.5,u:' mm'},
+{k:'dv',l:'Diamètre soupape adm. (% alésage)',min:35,max:50,d:42,u:' %'},
+{k:'ch',l:'Chambre de combustion',o:[['p','Pentroof'],['h','Hémisphérique'],['b','Baignoire']],d:'p'}]],
+['Admission',[
+{k:'as',l:'Aspiration',o:[['n','Atmosphérique'],['t','Turbo'],['b','Bi-turbo'],['c','Compresseur']],d:'n',s:NA},
+{k:'bs',l:'Pression de suralimentation (abs.)',min:1,max:2.5,step:0.05,d:1.5,u:' bar',s:function(P){return NA(P)&&P.as!='n'}},
+{k:'ic',l:'Intercooler',o:[['1','Oui'],['0','Non']],d:'1',s:function(P){return NA(P)&&P.as!='n'}},
+{k:'pa',l:'Pression d’air comprimé (abs.)',min:2,max:30,d:8,u:' bar',s:function(P){return P.fu=='a'}},
+{k:'ma',l:'Collecteur d’admission',o:[['l','Long (couple)'],['s','Court (régime)'],['i','Corps papillon individuels']],d:'l'},
+{k:'rl',l:'Longueur des conduits',min:80,max:450,step:10,d:250,u:' mm'},
+{k:'pd',l:'Diamètre du papillon',min:40,max:90,d:60,u:' mm'},
+{k:'fa',l:'Filtre à air',o:[['s','Série'],['p','Sport'],['o','Ouvert (cornet)']],d:'s'}]],
+['Échappement',[
+{k:'ec',l:'Collecteur',o:[['f','Fonte'],['t','Tubulaire 4-2-1'],['r','Racing équi-longueur']],d:'f'},
+{k:'ep',l:'Longueur des primaires',min:200,max:800,step:10,d:450,u:' mm'},
+{k:'dx',l:'Diamètre de la ligne',min:40,max:90,d:55,u:' mm'},
+{k:'ct',l:'Catalyseur',o:[['s','Série'],['p','Sport (métallique)'],['n','Aucun']],d:'s'},
+{k:'si',l:'Silencieux',o:[['s','Série'],['p','Sport'],['d','Ligne droite']],d:'s'}]],
+['Carburant',[
+{k:'fu',l:'Carburant / énergie',o:[['p95','Essence SP95'],['p98','Essence SP98'],['e','Éthanol E85'],['d','Diesel (gasoil)'],['a','Air comprimé']],d:'p98'},
+{k:'cr',l:'Rapport volumétrique',min:7,max:22,step:0.5,d:10.5,u:':1',s:NA},
+{k:'in',l:'Injection',o:[['c','Carburateur'],['i','Indirecte'],['d','Directe']],d:'i',s:NA}]],
+['Refroidissement',[
+{k:'rt',l:'Type de refroidissement',o:[['e','Liquide'],['a','Air'],['h','Air + huile']],d:'e'},
+{k:'tw',l:'Température de fonctionnement',min:70,max:110,d:90,u:' °C'},
+{k:'rd',l:'Taille du radiateur',min:50,max:150,d:100,u:' %',s:function(P){return P.rt!='a'}},
+{k:'ho',l:'Huile moteur',o:[['a','0W20 (fluide)'],['b','5W30'],['c','10W40'],['d','20W50 (épaisse)']],d:'b'},
+{k:'pc',l:'Lubrification',o:[['h','Carter humide'],['s','Carter sec']],d:'h'}]],
+['Réglages',[
+{k:'la',l:'Richesse λ (bas = riche)',min:0.8,max:1.2,step:0.01,d:1,s:NA},
+{k:'ad',l:'Avance à l’allumage / injection',min:0,max:25,d:12,u:'°',s:NA},
+{k:'li',l:'Limiteur de régime',min:70,max:100,d:100,u:' %'},
+{k:'id',l:'Régime de ralenti',min:600,max:1500,step:50,d:800,u:' tr/min'}]]];
+var ALL=[];CF.forEach(function(c){c[1].forEach(function(i){ALL.push(i)})});
+function build(){var t='',b='';
+ CF.forEach(function(c,i){t+='<button data-i="'+i+'">'+c[0]+'</button>';b+='<div class="p" id="p'+i+'">';
+  c[1].forEach(function(it){P[it.k]=it.d;
+   b+='<div id="w_'+it.k+'"><label>'+it.l+' <b id="v_'+it.k+'"></b></label>'+(it.o?'<select id="i_'+it.k+'">'+it.o.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>'}).join('')+'</select>':'<input type="range" id="i_'+it.k+'" min="'+it.min+'" max="'+it.max+'" step="'+(it.step||1)+'" value="'+it.d+'">')+'</div>'});
+  b+='</div>'});
+ $('tb').innerHTML=t;$('pn').innerHTML=b;
+ ALL.forEach(function(it){var e=$('i_'+it.k);if(it.o)e.value=it.d;e.oninput=e.onchange=function(){P[it.k]=it.o?e.value:+e.value;calc()}});
+ var bt=$('tb').children,i;for(i=0;i<bt.length;i++)bt[i].onclick=function(){tab('tb','p',+this.getAttribute('data-i'))};
+ bt=$('rtb').children;for(i=0;i<bt.length;i++)bt[i].onclick=function(){tab('rtb','r',+this.getAttribute('data-r'));RT=+this.getAttribute('data-r');drawAll()};
+ tab('tb','p',0);tab('rtb','r',0)}
+function tab(bar,pre,n){var bt=$(bar).children;for(var i=0;i<bt.length;i++){bt[i].className=i==n?'on':'';$(pre+i).className=(pre=='p'?'p':'rp')+(i==n?' on':'')}}
+function sync(){
+ if(P.ar!==lastAr){var old=$('i_nc').value,s='';CY[P.ar].forEach(function(n){s+='<option>'+n+'</option>'});$('i_nc').innerHTML=s;
+  $('i_nc').value=CY[P.ar].indexOf(+old)>=0?old:CY[P.ar][Math.min(2,CY[P.ar].length-1)];P.nc=$('i_nc').value;lastAr=P.ar}
+ ALL.forEach(function(it){if(it.s)$('w_'+it.k).style.display=it.s(P)?'':'none';$('v_'+it.k).textContent=it.o?'':P[it.k]+(it.u||'')})}
+function sm(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)}
+function G(r,c,w){return Math.exp(-Math.pow((r-c)/w,2))}
+function calc(){
+ sync();
+ var a=P.ar,n=+P.nc,B=P.bo/1000,S=P.st/1000,fu=P.fu,air=fu=='a',dsl=fu=='d',e85=fu=='e',as=air?'n':P.as,ic=P.ic=='1',vl=P.vl,ca=P.ca/100;
+ var M=function(k,o){return o[P[k]]||0};
+ var vd=Math.PI/4*B*B*S*n*1000;
+ var vpmax=air?12:dsl?16:21;
+ var mat=M('pi',{c:.9,f:1,l:1.08})*M('bi',{c:.95,a:1,t:1.05})*M('di',{o:.8,s:.93,d:1})*M('vi',{f:.92,a:1,b:1.05});
+ var redM=Math.min(vpmax*30/S*mat,air?5000:dsl?5400:10500),red=redM*P.li/100;
+ var rp=Math.min(.92*redM,redM*(.52+.2*ca+.02*(vl-2))*M('ma',{l:.92,s:1.05,i:1.12})*M('ec',{f:1,t:1.03,r:1.06})*Math.pow(250/P.rl,.3)*Math.pow(450/P.ep,.15));
+ var w=.5*redM*(1-.25*ca)*M('vv',{n:1,a:1.25,d:1.4});
+ var fi=Math.min(1.15,(P.dv/42)*(P.lv/10.5)*(0.6+0.1*vl));
+ var ex=M('ma',{l:0,s:.01,i:.03})+M('ec',{f:0,t:.02,r:.04})+M('ct',{s:-.025,p:-.01,n:0})+M('si',{s:-.02,p:-.01,d:0})+M('fa',{s:-.015,p:-.005,o:0});
+ var pk=(0.18+0.07*ca+ex)*fi,lo=.66+.03*(vl-2)-.1*ca+M('ma',{l:.04,s:0,i:-.02});
+ var lim=(fu=='p95'?10.5:e85?14:11.5)+(P.in=='d'?1:0)+(P.la<.95?.5:0)+M('ch',{p:0,h:.3,b:-.5})-(as!='n'?(P.bs-1)*1.5*(ic?1:1.8):0)-(P.tw-90)*.04+M('rt',{e:0,a:-.8,h:-.4});
+ var kn=dsl||air?0:Math.max(0,P.cr-lim)*.045+Math.max(0,P.ad-(14-Math.max(0,P.cr-10)*.8))*.01;
+ var ignf=dsl||air?1:Math.max(.7,1-.0015*Math.pow(P.ad-12,2));
+ var comb=dsl||air?1:1-2.2*Math.pow(P.la-.9,2);
+ var eta=(dsl?.68:.62)*(1-Math.pow(P.cr,-.3))*(1-kn)*ignf*comb*M('in',{c:.97,i:1,d:1.02})*M('ch',{p:1,h:1.01,b:.97});
+ var afr=(dsl?22:e85?9.8:14.7)*P.la,q=dsl?42.5e6:e85?29.7e6:43e6,lhv=q/1e6;
+ var lf=M('ar',{L:0,V:.02,W:.04,F:.01}),train=M('di',{o:0,s:.1,d:.2})+.03*vl+.01*P.pm;
+ var fmult=(1-.004*(P.tw-90))*M('ho',{a:.96,b:1,c:1.03,d:1.07})*(P.pc=='s'?.97:1);
+ var pts=[],T={p:0,t:0,rp:0,rt:0},pkb=0,best=null,r0=Math.max(600,P.id);
+ for(var r=r0;r<=red;r+=100){
+  var ramp=as=='t'?sm((r-2800)/900):as=='b'?sm((r-2200)/900):as=='c'?Math.min(1,Math.max(0,(r-1000)/1500)):0;
+  var bse=as=='n'?1:1+(P.bs-1)*ramp,dens=as=='n'?1:bse*(ic?.98:.91);
+  var thrF=Math.min(1,1.1*P.pd*P.pd/(vd*r*.185)),exF=Math.min(1,1.1*P.dx*P.dx/(vd*r*.16));
+  var ve=lo+pk*(G(r,rp,w)+.35*G(r,.62*rp,.6*w));
+  ve-=(as=='t'||as=='b')?.04*(bse-1)*Math.pow(r/redM,2):0;
+  ve=Math.min(1.12,ve)*Math.pow(thrF,.6)*Math.pow(exF,.4);
+  var vpm=2*S*r/60,fm=((.8+.5*Math.pow(vpm/10,2)*(1+lf)+train)*fmult)+(as=='c'?.35*(bse-1):0);
+  var lowf=1-.25*Math.exp(-(r-600)/700),etaR=eta*lowf,bi=air?0:etaR*q*1.2*ve*dens/afr/1e5;
+  var bm=air?Math.max(.4*(P.pa-1)*(.7+.3*ve)-fm*.5,0):Math.max(bi-fm,0);
+  var t=bm*1e5*(vd/1000)/(air?2*Math.PI:4*Math.PI),ch=t*2*Math.PI*r/60/1000*1.35962;
+  var bsfc=(!air&&bm>0&&bi>0)?Math.min(600,3600/(etaR*(bm/bi)*lhv)*(1+Math.max(0,1-P.la)*.8)):null;
+  pts.push([r,t,ch,ve*100,bsfc]);pkb=Math.max(pkb,bm);
+  if(t>T.t){T.t=t;T.rt=r}if(ch>T.p){T.p=ch;T.rp=r;best={bi:bi,bm:bm,fm:fm,e:etaR}}}
+ var tmin=0,tmax=0;pts.forEach(function(q){if(q[1]>=.9*T.t){if(!tmin)tmin=q[0];tmax=q[0]}});
+ var rdf=P.rt=='a'?1:P.rd/100,wt=vd*M('bl',{f:38,a:20,m:15})+25+3*n+M('di',{o:0,s:4,d:8})+M('as',{n:0,t:14,b:24,c:11})+(as!='n'&&ic?5:0)+M('ma',{l:0,s:0,i:4})+M('ec',{f:8,t:4,r:3})+M('ct',{s:5,p:3,n:0})+M('vo',{l:-3,s:0,h:4})+1.5*P.pm+(P.rt=='e'?8+12*rdf:P.rt=='a'?4:9)+(P.pc=='s'?6:0);
+ var cost=vd*400+n*250+M('bl',{f:0,a:600,m:1800})+M('pi',{c:0,f:300,l:900})+M('bi',{c:-100,a:0,t:1500})+M('vi',{f:0,a:400,b:2000})+M('vo',{l:300,s:0,h:0})+60*P.pm+M('di',{o:0,s:300,d:800})+M('vv',{n:0,a:400,d:900})+M('as',{n:0,t:1200,b:2400,c:1500})+(as!='n'&&ic?300:0)+M('ma',{l:0,s:100,i:1500})+M('ec',{f:0,t:400,r:1200})+M('ct',{s:0,p:300,n:-100})+M('si',{s:0,p:100,d:-50})+M('in',{c:-200,i:0,d:900})+vl*80*n+(P.rt=='e'?300+200*rdf:P.rt=='a'?150:600)+(P.pc=='s'?1500:0);
+ cost*=M('ar',{L:1,V:1.15,W:1.3,F:1.1});
+ var fm0=((.8+.5*Math.pow(2*S*2500/60/10,2)*(1+lf)+train)*fmult),loss=fm0*1e5*(vd/1000)/(4*Math.PI)*2*Math.PI*2500/60/1000;
+ var bsfcC=3600/(eta*lhv),cons=bsfcC*1.25*(12+loss)/(dsl?835:e85?790:745)/.9;
+ var vpr=2*S*red/60,chL=T.p/vd,hl=120*M('rt',{e:1,a:.6,h:.8})*rdf,over=Math.max(0,chL/hl-1);
+ var rel=100-Math.max(0,vpr-17)*5-Math.max(0,pkb-11)*4-(as!='n'?(P.bs-1)*10*(ic?1:1.6):0)-(dsl||air?0:Math.max(0,P.cr-12)*1.5)-ca*12-kn*250+M('bl',{f:8,a:0,m:-8})+M('pi',{c:6,f:0,l:-5})+M('bi',{c:5,a:0,t:-3})+M('vi',{f:0,a:3,b:6})+M('ho',{a:-3,b:0,c:2,d:4})+(P.pc=='s'?3:0)+Math.max(-4,Math.min(4,(P.pm-(n/2+1))*.8))+(100-P.li)*.4-over*60;
+ rel=Math.max(0,Math.min(100,rel));
+ var minId=(n<4?1100:n<6?850:700)*M('vo',{l:1.15,s:1,h:.9});
+ PT=pts;RED=red;NCYL=n;
+ GEO={a:a,n:n,B:B,S:S,an:P.an};
+ $('ra').max=Math.round(red/100)*100;if(AN.rpm>red)AN.rpm=Math.round(red/100)*100;$('ra').value=AN.rpm;
+ $('k1').textContent=Math.round(T.p)+' ch @ '+T.rp;$('k2').textContent=Math.round(T.t)+' Nm @ '+T.rt;
+ $('k3').textContent=Math.round(vd*1000)+' cm³';$('k4').textContent=Math.round(red)+' tr/min';
+ $('k5').textContent=Math.round(wt)+' kg';$('k6').textContent=air?'—':cons.toFixed(1)+' L/100';
+ $('k7').textContent=Math.round(rel)+' / 100';$('k7').style.color=rel>70?'var(--ok)':rel>40?'var(--wa)':'var(--ko)';
+ $('k8').textContent=(Math.round(cost/100)*100).toLocaleString('fr-FR')+' €';
+ var bal=BAL[a+n]||60,rows=[['PME max',pkb.toFixed(1)+' bar'],['Puissance spécifique',Math.round(T.p/vd)+' ch/L'],['Couple spécifique',Math.round(T.t/vd)+' Nm/L'],['Rapport poids/puissance',(wt/Math.max(T.p,1)).toFixed(2)+' kg/ch'],['Plage de couple ≥ 90 %',tmin+' – '+tmax+' tr/min'],['Vitesse moyenne du piston (max)',vpr.toFixed(1)+' m/s'],['Rapport course/alésage',(S/B).toFixed(2)],['Rendement thermique indiqué',air?'—':Math.round(eta*100)+' %'],['Conso. spécifique mini',air?'—':Math.round(Math.min.apply(null,pts.map(function(q){return q[4]||999})))+' g/kWh'],['Équilibrage',bal+' / 100']];
+ $('bil').innerHTML='<table>'+rows.map(function(x){return '<tr><td>'+x[0]+'</td><td>'+x[1]+'</td></tr>'}).join('')+'</table>';
+ if(best&&!air&&best.bi>0){var b=best.e*best.bm/best.bi*100,f=best.e*best.fm/best.bi*100,rest=100-best.e*100,co=rest*(.42-(P.tw-90)*.002),ea=rest-co;
+  var seg=[[b,'#34A7E9','Travail utile'],[f,'#868e96','Frottements'],[co,'#ffa94d','Refroidissement'],[ea,'#e8590c','Échappement']];
+  $('en').innerHTML='<div class="bar">'+seg.map(function(s){return '<i style="width:'+Math.max(0,s[0])+'%;background:'+s[1]+'"></i>'}).join('')+'</div><div class="lg">'+seg.map(function(s){return '<span style="color:'+s[1]+'">■ '+s[2]+' '+Math.round(Math.max(0,s[0]))+' %</span>'}).join('')+'</div>'}
+ else $('en').innerHTML='<div class="n">Non applicable pour l’air comprimé.</div>';
+ var nt={L:'En ligne : compact en largeur, simple et économique.',V:'En V : plus court qu’une ligne, bon compromis.',W:'En W : rangées en éventail, très compact en longueur mais complexe et lourd.',F:'À plat : centre de gravité très bas, mais moteur large.'};
+ $('nt').textContent=nt[a]+(air?' Air comprimé : cycle simple, sans combustion.':'');
+ var wr=[];if(kn>.01)wr.push('⚠ Cliquetis probable : baisse le rapport volumétrique, la pression ou l’avance.');
+ if(over>.05)wr.push('⚠ Surchauffe : agrandis le radiateur ou change de refroidissement.');
+ if(rel<40)wr.push('⚠ Fiabilité faible : réduis le régime, la pression ou les cames.');
+ if(P.id<minId)wr.push('⚠ Ralenti instable : monte le régime de ralenti ou alourdis le volant.');
+ $('wr').innerHTML=wr.join('<br>');
+ drawAll();layout(a,n)}
+function drawAll(){if(RT==0){draw($('cv'),PT,[{k:2,c:'--ac',z:1},{k:1,c:'--ac2',z:1}]);draw($('cv2'),PT,[{k:3,c:'--ac',z:1},{k:4,c:'--ac2'}])}}
+function draw(c,p,S){
+ if(!p.length)return;var d=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;if(!w)return;c.width=w*d;c.height=h*d;
+ var x=c.getContext('2d');x.scale(d,d);var cs=getComputedStyle(document.documentElement);
+ var tx=cs.getPropertyValue('--mu'),bd=cs.getPropertyValue('--bd');
+ var L=42,R=42,T=10,Bt=26,pw=w-L-R,ph=h-T-Bt,r0=p[0][0],r1=p[p.length-1][0];if(r1<=r0)r1=r0+1;
+ var ax=S.map(function(s){var v=p.map(function(q){return q[s.k]}).filter(function(z){return z!=null&&isFinite(z)});var mx=Math.max.apply(null,v)*1.1||1,mn=s.z?0:Math.floor(Math.min.apply(null,v)*.9);return{mx:mx,mn:mn,col:cs.getPropertyValue(s.c)}});
+ x.font='11px Arial';x.lineWidth=1;
+ for(var i=0;i<=4;i++){var y=T+ph*i/4;x.strokeStyle=bd;x.beginPath();x.moveTo(L,y);x.lineTo(w-R,y);x.stroke();
+  ax.forEach(function(a,j){x.fillStyle=a.col;x.textAlign=j?'left':'right';x.fillText(Math.round(a.mn+(a.mx-a.mn)*(1-i/4)),j?w-R+5:L-5,y+4)})}
+ x.fillStyle=tx;x.textAlign='center';
+ for(var r=Math.ceil(r0/1000)*1000;r<=r1;r+=1000)x.fillText(r,L+pw*(r-r0)/(r1-r0),h-8);
+ S.forEach(function(s,j){var a=ax[j],on=false;x.strokeStyle=a.col;x.lineWidth=2.5;x.beginPath();
+  p.forEach(function(q){var v=q[s.k];if(v==null){on=false;return}var xx=L+pw*(q[0]-r0)/(r1-r0),yy=T+ph*(1-(v-a.mn)/(a.mx-a.mn));on?x.lineTo(xx,yy):x.moveTo(xx,yy);on=true});x.stroke()})}
+function layout(a,n){
+ var an=P.an,ang={L:[0],V:[-an/2,an/2],W:[-an/2,0,an/2],F:[-90,90]}[a],bk=ang.length,per=n/bk,h='',cx=200,cy=110;
+ ang.forEach(function(g){h+='<g transform="translate('+cx+','+cy+') rotate('+g+')"><rect x="-17" y="-90" width="34" height="68" rx="4" fill="var(--bd)" stroke="var(--mu)"/><rect x="-11" y="-62" width="22" height="30" rx="3" fill="var(--ac)" opacity=".8"/></g>'});
+ h+='<circle cx="'+cx+'" cy="'+cy+'" r="14" fill="var(--card)" stroke="var(--tx)" stroke-width="2"/>';
+ h+='<text x="12" y="20" fill="var(--tx)" font-size="14" font-weight="600">'+({L:'L',V:'V',W:'W',F:'Flat'}[a])+n+'</text><text x="12" y="38" fill="var(--mu)" font-size="12">'+bk+' rangée'+(bk>1?'s':'')+' · '+(per%1?per.toFixed(1):per)+' cyl. / rangée</text>';
+ $('sv').innerHTML=h}
+var COL=['#ff6b3d','#868e96','#4dabf7','#e0a800'];
+function eng(){
+ var c=$('ea'),d=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;if(!w||!GEO.n)return;c.width=w*d;c.height=h*d;
+ var x=c.getContext('2d');x.scale(d,d);
+ var a=GEO.a,n=GEO.n,Rs=GEO.S*500,Lr=Rs*1.75,Bm=GEO.B*1000,an=GEO.an;
+ var ang={L:[0],V:[-an/2,an/2],W:[-an/2,0,an/2],F:[-90,90]}[a],bk=ang.length;
+ var k=Math.min(w*.46,h*.66)/(Rs+Lr+30),cx=w/2,cy=a=='F'?h/2:h*.74,bw=Math.min(Bm*k,(a=='L'?w*.3:w*.2)),ph=bw*.5;
+ var cs=getComputedStyle(document.documentElement),tx=cs.getPropertyValue('--tx'),mu=cs.getPropertyValue('--mu'),bd=cs.getPropertyValue('--bd'),ac=cs.getPropertyValue('--ac');
+ ang.forEach(function(g,b){
+  var cyc=(AN.th+b*720/bk)%720,phi=(cyc%360)*Math.PI/180,st=Math.floor(cyc/180);
+  var y=Rs*Math.cos(phi)+Math.sqrt(Lr*Lr-Rs*Rs*Math.sin(phi)*Math.sin(phi)),Yp=y*k,head=(Lr+Rs)*k+ph*.4+2;
+  x.save();x.translate(cx,cy);x.rotate(g*Math.PI/180);
+  x.strokeStyle=mu;x.lineWidth=2;x.beginPath();x.moveTo(-bw/2,-(Lr-Rs)*k+ph);x.lineTo(-bw/2,-head);x.lineTo(bw/2,-head);x.lineTo(bw/2,-(Lr-Rs)*k+ph);x.stroke();
+  x.globalAlpha=.55;x.fillStyle=COL[st];x.fillRect(-bw/2+1,-head+1,bw-2,head-Yp-ph*.4-1);x.globalAlpha=1;
+  x.strokeStyle=tx;x.lineWidth=3;x.beginPath();x.moveTo(0,-Yp);x.lineTo(Rs*k*Math.sin(phi),-Rs*k*Math.cos(phi));x.stroke();
+  x.fillStyle=bd;x.strokeStyle=mu;x.lineWidth=1.5;x.fillRect(-bw/2+1,-Yp-ph*.4,bw-2,ph);x.strokeRect(-bw/2+1,-Yp-ph*.4,bw-2,ph);
+  x.restore()});
+ x.fillStyle=ac;x.beginPath();x.arc(cx,cy,Rs*k+4,0,6.2832);x.fill();
+ x.fillStyle=tx;x.beginPath();x.arc(cx,cy,5,0,6.2832);x.fill();
+ var th=AN.th*Math.PI/180;x.strokeStyle=tx;x.lineWidth=3;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Rs*k*Math.sin(th),cy-Rs*k*Math.cos(th));x.stroke();
+ var q=PT.reduce(function(m,p){return Math.abs(p[0]-AN.rpm)<Math.abs(m[0]-AN.rpm)?p:m},PT[0]);
+ $('rd').textContent='À '+AN.rpm+' tr/min : '+Math.round(q[2])+' ch · '+Math.round(q[1])+' Nm · remplissage '+Math.round(q[3])+' %';$('vr').textContent=AN.rpm+' tr/min';
+ if(AN.osc){AN.osc.frequency.value=Math.max(20,AN.rpm/60*n/2);AN.g.gain.value=AN.on?.05:0}}
+function loop(ts){requestAnimationFrame(loop);var dt=Math.min(.05,(ts-AN.t)/1000||0);AN.t=ts;if(RT!=1||!PT.length)return;if(AN.on)AN.th=(AN.th+.09*AN.rpm*dt)%720;eng()}
+$('ra').oninput=function(){AN.rpm=+this.value};
+$('bp').onclick=function(){AN.on=!AN.on;this.textContent=AN.on?'Pause':'Lecture'};
+$('bs2').onclick=function(){
+ if(!AN.ctx){var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AN.ctx=new C();AN.osc=AN.ctx.createOscillator();AN.osc.type='sawtooth';var f=AN.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=700;AN.g=AN.ctx.createGain();AN.g.gain.value=0;AN.osc.connect(f);f.connect(AN.g);AN.g.connect(AN.ctx.destination);AN.osc.start();AN.snd=true}
+ else{AN.snd=!AN.snd;AN.g.gain.value=0}
+ if(AN.ctx.state=='suspended')AN.ctx.resume();
+ this.textContent='Son : '+(AN.snd?'on':'off');if(!AN.snd)AN.g.gain.value=0;else AN.g.gain.value=.05};
+build();calc();requestAnimationFrame(loop);window.onresize=function(){drawAll();if(RT==1)eng()};
+</script></body></html>
